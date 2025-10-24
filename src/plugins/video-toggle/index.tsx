@@ -173,6 +173,13 @@ export default createPlugin({
       const switchButtonContainer = document.createElement('div');
       switchButtonContainer.id = 'ytmd-video-toggle-switch-button-container';
       switchButtonContainer.style.display = 'flex';
+      
+      switchButtonContainer.style.position = 'absolute';
+      switchButtonContainer.style.top = '0';
+      switchButtonContainer.style.left = '0';
+      switchButtonContainer.style.width = '100%';
+      switchButtonContainer.style.zIndex = '10';
+      
       render(
         () => (
           <Show when={showButton()}>
@@ -211,18 +218,46 @@ export default createPlugin({
         ); // custom mode
         if (checkbox) checkbox.checked = !this.config?.hideVideo;
 
-        if (player) {
+        const songVideo = document.querySelector<HTMLElement>(
+          '#song-video.ytmusic-player',
+        );
+        const songImage = document.querySelector<HTMLElement>('#song-image');
+
+        if (player && songVideo && songImage) {
           player.style.margin = showVideo ? '' : 'auto 0px';
+
+          songVideo.style.position = 'absolute';
+          songVideo.style.top = '0';
+          songVideo.style.left = '0';
+          songVideo.style.width = '100%';
+          songVideo.style.height = '100%';
+
+          songImage.style.position = 'absolute';
+          songImage.style.top = '0';
+          songImage.style.left = '0';
+          songImage.style.width = '100%';
+          songImage.style.height = '100%';
+
           player.setAttribute(
             'playback-mode',
             showVideo ? 'OMV_PREFERRED' : 'ATV_PREFERRED',
           );
+          
+          if (showVideo) {
+            songVideo.style.display = 'block';
+            songVideo.style.zIndex = '1';
 
-          document.querySelector<HTMLElement>(
-            '#song-video.ytmusic-player',
-          )!.style.display = showVideo ? 'block' : 'none';
-          document.querySelector<HTMLElement>('#song-image')!.style.display =
-            showVideo ? 'none' : 'block';
+            songImage.style.opacity = '0';
+            songImage.style.pointerEvents = 'none';
+            songImage.style.zIndex = '-1';
+          } else {
+            songVideo.style.display = 'none';
+            songVideo.style.zIndex = '0';
+
+            songImage.style.opacity = '1';
+            songImage.style.pointerEvents = 'auto';
+            songImage.style.zIndex = '0';
+          }
 
           if (showVideo && video && !video.style.top) {
             video.style.top = `${
